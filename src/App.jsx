@@ -3,13 +3,62 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 
-const menuItems = ["Inicio", "Choferes", "Cargas Semanales", "Gastos", "Reportes"];
+const menuItems = ["Inicio", "Agregar Chofer", "Editar Chofer", "Eliminar Chofer", "Cargas Semanales", "Gastos", "Reportes"];
 
 export default function App() {
-  const [chofer, setChofer] = useState({ nombre: "", licencia: "", telefono: "", direccion: "" });
+  const [chofer, setChofer] = useState({
+    nombre: "",
+    licencia: "",
+    telefono: "",
+    direccionNumeroCalle: "",
+    direccionCiudadEstadoZip: "",
+    email: "",
+    fechaNacimiento: "",
+    fechaContratacion: "",
+    ssn: "",
+    foto: "",
+    estado: "activo",
+  });
+  const [choferes, setChoferes] = useState([]);
   const [cargas, setCargas] = useState([]);
   const [gastos, setGastos] = useState({ recurrentes: 0, adicionales: 0, combustible: 0 });
   const [seccion, setSeccion] = useState("Inicio");
+  const [editarIndex, setEditarIndex] = useState(null);
+
+  const agregarChofer = () => {
+    if (editarIndex !== null) {
+      const nuevos = [...choferes];
+      nuevos[editarIndex] = chofer;
+      setChoferes(nuevos);
+      setEditarIndex(null);
+    } else {
+      setChoferes([...choferes, chofer]);
+    }
+    setChofer({
+      nombre: "",
+      licencia: "",
+      telefono: "",
+      direccionNumeroCalle: "",
+      direccionCiudadEstadoZip: "",
+      email: "",
+      fechaNacimiento: "",
+      fechaContratacion: "",
+      ssn: "",
+      foto: "",
+      estado: "activo",
+    });
+  };
+
+  const eliminarChofer = (index) => {
+    const nuevos = choferes.filter((_, i) => i !== index);
+    setChoferes(nuevos);
+  };
+
+  const seleccionarChofer = (index) => {
+    setChofer(choferes[index]);
+    setEditarIndex(index);
+    setSeccion("Agregar Chofer");
+  };
 
   const agregarCarga = () => {
     setCargas([...cargas, { fecha: "", origen: "", destino: "", precio: 0, porcentaje: 0 }]);
@@ -39,7 +88,7 @@ export default function App() {
     doc.text(`Chofer: ${chofer.nombre}`, 20, 30);
     doc.text(`Licencia: ${chofer.licencia}`, 20, 40);
     doc.text(`Teléfono: ${chofer.telefono}`, 20, 50);
-    doc.text(`Dirección: ${chofer.direccion}`, 20, 60);
+    doc.text(`Dirección: ${chofer.direccionNumeroCalle}, ${chofer.direccionCiudadEstadoZip}`, 20, 60);
 
     let y = 70;
     doc.setFontSize(12);
@@ -87,7 +136,7 @@ export default function App() {
       <div className="p-4 max-w-3xl mx-auto flex-1">
         <h1 className="text-xl font-bold mb-4">{seccion}</h1>
 
-        {seccion === "Choferes" && (
+        {seccion === "Agregar Chofer" && (
           <div className="mb-4">
             {Object.keys(chofer).map((campo) => (
               <input
@@ -97,6 +146,31 @@ export default function App() {
                 onChange={(e) => setChofer({ ...chofer, [campo]: e.target.value })}
                 className="border p-1 w-full my-1"
               />
+            ))}
+            <button onClick={agregarChofer} className="bg-blue-600 text-white px-4 py-2 rounded">
+              {editarIndex !== null ? "Actualizar Chofer" : "Guardar Chofer"}
+            </button>
+          </div>
+        )}
+
+        {seccion === "Editar Chofer" && (
+          <div>
+            {choferes.map((c, i) => (
+              <div key={i} className="border p-2 my-2">
+                <p>{c.nombre}</p>
+                <button onClick={() => seleccionarChofer(i)} className="text-sm text-blue-600">Editar</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {seccion === "Eliminar Chofer" && (
+          <div>
+            {choferes.map((c, i) => (
+              <div key={i} className="border p-2 my-2">
+                <p>{c.nombre}</p>
+                <button onClick={() => eliminarChofer(i)} className="text-sm text-red-600">Eliminar</button>
+              </div>
             ))}
           </div>
         )}
