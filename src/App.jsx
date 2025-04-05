@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import jsPDF from "jspdf";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const menuItems = [
   { label: "Inicio" },
@@ -33,6 +34,11 @@ export default function App() {
   const [gastos, setGastos] = useState({ recurrentes: 0, adicionales: 0, combustible: 0 });
   const [seccion, setSeccion] = useState("Inicio");
   const [editarIndex, setEditarIndex] = useState(null);
+  const [submenuAbierto, setSubmenuAbierto] = useState(null);
+
+  const toggleSubmenu = (label) => {
+    setSubmenuAbierto(submenuAbierto === label ? null : label);
+  };
 
   const agregarChofer = () => {
     if (editarIndex !== null) {
@@ -134,23 +140,30 @@ export default function App() {
         <h1 className="text-xl font-bold mb-4">HG Transport</h1>
         <ul>
           {menuItems.map((item) => (
-            <li key={item.label || item} className="mb-2">
-              {typeof item === "string" ? (
-                <button onClick={() => setSeccion(item)} className="text-left w-full">
-                  {item}
+            <li key={item.label} className="mb-2">
+              {!item.subItems ? (
+                <button onClick={() => setSeccion(item.label)} className="text-left w-full">
+                  {item.label}
                 </button>
               ) : (
                 <div>
-                  <span className="font-semibold block mb-1">{item.label}</span>
-                  <ul className="ml-4">
-                    {item.subItems.map((sub) => (
-                      <li key={sub} className="mb-1">
-                        <button onClick={() => setSeccion(sub)} className="text-left w-full text-sm">
-                          {sub}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                  <button
+                    onClick={() => toggleSubmenu(item.label)}
+                    className="flex justify-between items-center w-full text-left font-semibold mb-1"
+                  >
+                    {item.label} {submenuAbierto === item.label ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                  {submenuAbierto === item.label && (
+                    <ul className="ml-4">
+                      {item.subItems.map((sub) => (
+                        <li key={sub} className="mb-1">
+                          <button onClick={() => setSeccion(sub)} className="text-left w-full text-sm">
+                            {sub}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
             </li>
