@@ -1,12 +1,15 @@
-// Demo sin base de datos - Sistema para HG Transport LLC
+// Demo sin base de datos - Sistema para HG Transport LLC con Menú lateral
 
 import React, { useState } from "react";
 import jsPDF from "jspdf";
+
+const menuItems = ["Inicio", "Choferes", "Cargas Semanales", "Gastos", "Reportes"];
 
 export default function App() {
   const [chofer, setChofer] = useState({ nombre: "", licencia: "", telefono: "", direccion: "" });
   const [cargas, setCargas] = useState([]);
   const [gastos, setGastos] = useState({ recurrentes: 0, adicionales: 0, combustible: 0 });
+  const [seccion, setSeccion] = useState("Inicio");
 
   const agregarCarga = () => {
     setCargas([...cargas, { fecha: "", origen: "", destino: "", precio: 0, porcentaje: 0 }]);
@@ -32,7 +35,7 @@ export default function App() {
   const generarPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(14);
-    doc.text("HG Transport LLC - Reporte Semanal", 20, 20);
+    doc.text("HG Transport LLC - Driver Pay Report", 20, 20);
     doc.text(`Chofer: ${chofer.nombre}`, 20, 30);
     doc.text(`Licencia: ${chofer.licencia}`, 20, 40);
     doc.text(`Teléfono: ${chofer.telefono}`, 20, 50);
@@ -68,54 +71,73 @@ export default function App() {
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">HG Transport - Demo</h1>
-
-      <div className="mb-4">
-        <h2 className="font-semibold">Datos del Chofer</h2>
-        {Object.keys(chofer).map((campo) => (
-          <input
-            key={campo}
-            placeholder={campo}
-            value={chofer[campo]}
-            onChange={(e) => setChofer({ ...chofer, [campo]: e.target.value })}
-            className="border p-1 w-full my-1"
-          />
-        ))}
+    <div className="flex">
+      <div className="w-1/4 bg-gray-200 min-h-screen p-4">
+        <h1 className="text-xl font-bold mb-4">HG Transport</h1>
+        <ul>
+          {menuItems.map((item) => (
+            <li key={item} className="mb-2">
+              <button onClick={() => setSeccion(item)} className="text-left w-full">
+                {item}
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
+      <div className="p-4 max-w-3xl mx-auto flex-1">
+        <h1 className="text-xl font-bold mb-4">{seccion}</h1>
 
-      <div className="mb-4">
-        <h2 className="font-semibold">Cargas Semanales</h2>
-        {cargas.map((carga, index) => (
-          <div key={index} className="mb-2 border p-2">
-            {Object.keys(carga).map((campo) => (
+        {seccion === "Choferes" && (
+          <div className="mb-4">
+            {Object.keys(chofer).map((campo) => (
               <input
                 key={campo}
                 placeholder={campo}
-                value={carga[campo]}
-                onChange={(e) => actualizarCarga(index, campo, e.target.value)}
+                value={chofer[campo]}
+                onChange={(e) => setChofer({ ...chofer, [campo]: e.target.value })}
                 className="border p-1 w-full my-1"
               />
             ))}
           </div>
-        ))}
-        <button onClick={agregarCarga} className="bg-blue-500 text-white px-2 py-1 rounded">Agregar Carga</button>
-      </div>
+        )}
 
-      <div className="mb-4">
-        <h2 className="font-semibold">Gastos</h2>
-        {Object.keys(gastos).map((tipo) => (
-          <input
-            key={tipo}
-            placeholder={tipo}
-            value={gastos[tipo]}
-            onChange={(e) => setGastos({ ...gastos, [tipo]: e.target.value })}
-            className="border p-1 w-full my-1"
-          />
-        ))}
-      </div>
+        {seccion === "Cargas Semanales" && (
+          <div className="mb-4">
+            {cargas.map((carga, index) => (
+              <div key={index} className="mb-2 border p-2">
+                {Object.keys(carga).map((campo) => (
+                  <input
+                    key={campo}
+                    placeholder={campo}
+                    value={carga[campo]}
+                    onChange={(e) => actualizarCarga(index, campo, e.target.value)}
+                    className="border p-1 w-full my-1"
+                  />
+                ))}
+              </div>
+            ))}
+            <button onClick={agregarCarga} className="bg-blue-500 text-white px-2 py-1 rounded">Agregar Carga</button>
+          </div>
+        )}
 
-      <button onClick={generarPDF} className="bg-green-600 text-white px-4 py-2 rounded">Generar PDF</button>
+        {seccion === "Gastos" && (
+          <div className="mb-4">
+            {Object.keys(gastos).map((tipo) => (
+              <input
+                key={tipo}
+                placeholder={tipo}
+                value={gastos[tipo]}
+                onChange={(e) => setGastos({ ...gastos, [tipo]: e.target.value })}
+                className="border p-1 w-full my-1"
+              />
+            ))}
+          </div>
+        )}
+
+        {seccion === "Reportes" && (
+          <button onClick={generarPDF} className="bg-green-600 text-white px-4 py-2 rounded">Generar PDF</button>
+        )}
+      </div>
     </div>
   );
 }
