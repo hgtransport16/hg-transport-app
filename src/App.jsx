@@ -1,9 +1,18 @@
-// Demo sin base de datos - Sistema para HG Transport LLC con Menú lateral
+// Demo sin base de datos - Sistema para HG Transport LLC con Menú lateral y submenú para choferes
 
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 
-const menuItems = ["Inicio", "Agregar Chofer", "Editar Chofer", "Eliminar Chofer", "Cargas Semanales", "Gastos", "Reportes"];
+const menuItems = [
+  { label: "Inicio" },
+  {
+    label: "Choferes",
+    subItems: ["Agregar Chofer", "Editar Chofer", "Eliminar Chofer"]
+  },
+  { label: "Cargas Semanales" },
+  { label: "Gastos" },
+  { label: "Reportes" }
+];
 
 export default function App() {
   const [chofer, setChofer] = useState({
@@ -125,10 +134,25 @@ export default function App() {
         <h1 className="text-xl font-bold mb-4">HG Transport</h1>
         <ul>
           {menuItems.map((item) => (
-            <li key={item} className="mb-2">
-              <button onClick={() => setSeccion(item)} className="text-left w-full">
-                {item}
-              </button>
+            <li key={item.label || item} className="mb-2">
+              {typeof item === "string" ? (
+                <button onClick={() => setSeccion(item)} className="text-left w-full">
+                  {item}
+                </button>
+              ) : (
+                <div>
+                  <span className="font-semibold block mb-1">{item.label}</span>
+                  <ul className="ml-4">
+                    {item.subItems.map((sub) => (
+                      <li key={sub} className="mb-1">
+                        <button onClick={() => setSeccion(sub)} className="text-left w-full text-sm">
+                          {sub}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </li>
           ))}
         </ul>
