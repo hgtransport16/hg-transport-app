@@ -140,8 +140,8 @@ export default function App() {
   };
 
   return (
-    <div className="flex">
-      <div className="w-64 bg-gray-100 min-h-screen p-4 shadow-md">
+    <div className="flex w-screen h-screen">
+      <div className="w-64 bg-gray-100 p-4 shadow-md overflow-y-auto flex-shrink-0">
         <h1 className="text-2xl font-bold text-center mb-6">HG Transport</h1>
         <ul>
           {menuItems.map((item) => (
@@ -183,36 +183,59 @@ export default function App() {
         </ul>
       </div>
 
-      <div className="p-6 w-full max-w-4xl mx-auto">
+      <div className="flex-1 ml-6 px-10 py-6 bg-white overflow-y-auto">
         <h1 className="text-2xl font-bold mb-6">{seccion}</h1>
 
+        {seccion === "Inicio" && (
+          <div className="space-y-6">
+            <p className="text-lg">Bienvenido a HG Transport. Desde aquí puedes gestionar a tus choferes, registrar cargas, llevar control de gastos y generar reportes.</p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-blue-100 p-4 rounded shadow">
+                <p className="font-semibold">Choferes registrados:</p>
+                <p className="text-2xl">{choferes.length}</p>
+              </div>
+              <div className="bg-green-100 p-4 rounded shadow">
+                <p className="font-semibold">Cargas esta semana:</p>
+                <p className="text-2xl">{cargas.length}</p>
+              </div>
+              <div className="bg-yellow-100 p-4 rounded shadow">
+                <p className="font-semibold">Total gastos:</p>
+                <p className="text-2xl">${gastos.recurrentes + gastos.adicionales + gastos.combustible}</p>
+              </div>
+            </div>
+
+            <div className="space-x-4">
+              <button onClick={() => setSeccion("Agregar Chofer")} className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Agregar Chofer</button>
+              <button onClick={() => setSeccion("Cargas Semanales")} className="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">Registrar Carga</button>
+              <button onClick={() => setSeccion("Reportes")} className="bg-gray-700 text-white px-4 py-2 rounded shadow hover:bg-gray-800">Ver Reporte</button>
+            </div>
+          </div>
+        )}
+
         {seccion === "Agregar Chofer" && (
-          <div className="mb-4 bg-white p-6 rounded shadow-md">
-            {seccionesFormulario.map((seccion) => (
-              <div key={seccion.titulo} className="mb-6">
-                <h2 className="text-lg font-semibold mb-4 border-b pb-1">{seccion.titulo}</h2>
-                <div className="space-y-4">
-                  {seccion.campos.map((campo) => (
-                    <div key={campo} className="flex items-center">
-                      <label className="w-1/3 text-right font-medium pr-4">{(etiquetas[campo] || campo) + ':'}</label>
-                      <div className="w-2/3">
-                        <input
-                          type={campo.toLowerCase().includes("fecha") ? "date" : "text"}
-                          value={chofer[campo]}
-                          onChange={(e) => setChofer({ ...chofer, [campo]: e.target.value })}
-                          className="w-full border border-gray-300 p-2 rounded"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <div className="bg-gray-50 p-6 rounded shadow-md space-y-6">
+            {seccionesFormulario.map((seccionForm) => (
+              <div key={seccionForm.titulo} className="space-y-4">
+                <h2 className="text-lg font-semibold border-b pb-1">{seccionForm.titulo}</h2>
+                {seccionForm.campos.map((campo) => (
+                  <div key={campo} className="flex items-center">
+                    <label className="w-1/3 text-right pr-4 font-medium">{etiquetas[campo]}:</label>
+                    <input
+                      type={campo.toLowerCase().includes("fecha") ? "date" : "text"}
+                      value={chofer[campo]}
+                      onChange={(e) => setChofer({ ...chofer, [campo]: e.target.value })}
+                      className="w-2/3 border border-gray-300 p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             ))}
-            {error && <p className="text-red-600 text-sm my-4">{error}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
             <div className="text-center">
               <button
                 onClick={agregarChofer}
-                className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow"
+                className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700"
               >
                 {editarIndex !== null ? "Actualizar Chofer" : "Guardar Chofer"}
               </button>
